@@ -1,53 +1,50 @@
-> **Note:** The following Mermaid diagram won't render on GitHub natively. To view it rendered, use a Markdown viewer that supports Mermaid, such as VS Code with the [Markdown Preview Mermaid Support](https://marketplace.visualstudio.com/items?itemName=bierner.markdown-mermaid) extension.
-
-<details>
-<summary>Click to view Mermaid diagram source</summary>
-
 ```mermaid
 graph TD
-  A[catalyst/] --> A1[CITATION.cff]
-  A --> A2[LICENSE]
-  A --> A3[MANIFEST.in]
-  A --> A4[Makefile]
-  A --> A5[README.md]
-  A --> A6[benchmark/]
-  A --> A7[bin/]
-  A --> A8[demos/]
-  A --> A9[doc/]
-  A --> A10[frontend/]
-  A --> A11[mlir/]
-  A --> A12[pyproject.toml]
-  A --> A13[requirements.txt]
-  A --> A14[runtime/]
-  A --> A15[setup.py]
-  A --> A16[setup_dev_from_wheel.sh]
-  A --> A17[standalone_plugin_wheel/]
+  ch2_compiler["llvm_project/mlir/examples/toy/Ch2"]
 
-  A14 --> B1[CMakeLists.txt]
-  A14 --> B2[Makefile]
-  A14 --> B3[README.rst]
-  A14 --> B4[build/]
-  A14 --> B5[include/]
-  A14 --> B6[tests/]
-  A14 --> B7[lib/]
+  toyc.cpp["toyc.cpp"]
+  include["include"]
+  parser["parser"]
+  mlir["mlir"] 
+  cmakelists.txt["CMakeLists.txt"]
 
-  B7 --> C1[CMakeLists.txt]
-  B7 --> C2[OQDcapi/]
-  B7 --> C3[backend/]
+  ch2_compiler --> toyc.cpp
+  ch2_compiler --> include
+  ch2_compiler --> parser
+  ch2_compiler --> mlir
+  ch2_compiler --> cmakelists.txt
 
-  C3 --> D1[CMakeLists.txt]
-  C3 --> D2[common/]
-  C3 --> D3[null_qubit/]
-  C3 --> D4[openqasm/]
-  C3 --> D5[oqd/]
-  C3 --> D6[custom_device/]
+  AST.cpp["AST.cpp"]
 
-  D6 --> E1[CustomDevice.cpp]
-  D6 --> E2[CustomDevice.hpp]
-  D6 --> E3[CMakeLists.txt]
-  D6 --> E4[custom_device.toml]
+  parser --> AST.cpp
 
-  %% Highlight custom_device branch
-  class D6,E1,E2,E3,E4 custom;
+  toy["toy"]
 
-  classDef custom fill=#ffebcc,stroke=#ff9900,stroke-width=2;
+  include --> toy
+
+  AST.h["AST.h"]
+  Lexer.h["Lexer.h"]
+  Parser.h["Parser.h"]
+  MLIRGen.h["MLIRGen.h"]
+  Ops.td["Ops.td"]
+
+  toy --> AST.h
+  toy --> Lexer.h
+  toy --> Parser.h
+  toy --> MLIRGen.h
+  toy --> Ops.td
+
+  Dialect.cpp["Dialect.cpp"] 
+  MLIRGen.cpp["MLIRGen.cpp"] 
+
+  mlir --> Dialect.cpp
+  mlir --> MLIRGen.cpp
+
+  classDef yellow fill:#ff0,stroke:#333,stroke-width:2px,color:#000;
+
+  class mlir yellow
+  class Dialect.cpp yellow
+  class MLIRGen.cpp yellow
+  class MLIRGen.h yellow
+  class Ops.td yellow
+```
