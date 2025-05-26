@@ -274,4 +274,4 @@ set_property(TARGET rtd_custom_device PROPERTY POSITION_INDEPENDENT_CODE ON)
  configure_file(openqasm/braket_local_qubit.toml braket_local_qubit.toml)
  configure_file(openqasm/braket_aws_qubit.toml braket_aws_qubit.toml)
  endif()
-
+```
