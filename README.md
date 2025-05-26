@@ -1,5 +1,6 @@
 # How to add a custom device in Catalyst (Pennylane's JIT compiler)
 
+```mermaid
 graph TD
 
   A[root:/catalyst]
@@ -71,4 +72,4 @@ graph TD
   %% Styling
   classDef custom fill:#ffebcc,stroke:#ff9900,stroke-width:2px;
   class B6,CD1,CD2,CD3,CD4 custom;
-
+```
