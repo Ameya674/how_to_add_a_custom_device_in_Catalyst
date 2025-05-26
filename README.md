@@ -37,23 +37,25 @@ graph TD
 
   %% Relationships
   A --> A1
-  A1 --> R3
   A1 --> R1
   A1 --> R2
+  A1 --> R3
+  R3 --> L1
   R3 --> L3
-  L3 --> B2
   L3 --> B1
+  L3 --> B2
   B2 --> CD1
   B2 --> CD2
   B2 --> CD3
   B2 --> CD4
 
   %% Styling
-  classDef custom fill:#ffebcc,stroke:#ff9900,stroke-width:2px;
   classDef yellow fill:#ffff99,stroke:#333,stroke-width:2px,color:#000;
+  classDef custom fill:#ffebcc,stroke:#ff9900,stroke-width:2px;
 
   class R1,R2,L1,B1,CD3 yellow;
   class B2,CD1,CD2,CD4 custom;
+
 
 
 ```
