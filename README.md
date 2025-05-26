@@ -1,50 +1,74 @@
-```mermaid
+# How to add a custom device in Catalyst (Pennylane's JIT compiler)
+
 graph TD
-  ch2_compiler["llvm_project/mlir/examples/toy/Ch2"]
 
-  toyc.cpp["toyc.cpp"]
-  include["include"]
-  parser["parser"]
-  mlir["mlir"] 
-  cmakelists.txt["CMakeLists.txt"]
+  A[root:/catalyst]
 
-  ch2_compiler --> toyc.cpp
-  ch2_compiler --> include
-  ch2_compiler --> parser
-  ch2_compiler --> mlir
-  ch2_compiler --> cmakelists.txt
+  subgraph Catalyst Root
+    A1[CITATION.cff]
+    A2[LICENSE]
+    A3[MANIFEST.in]
+    A4[Makefile]
+    A5[README.md]
+    A6[pyproject.toml]
+    A7[requirements.txt]
+    A8[setup.py]
+    A9[setup_dev_from_wheel.sh]
+    A10[bin/]
+    A11[benchmark/]
+    A12[demos/]
+    A13[doc/]
+    A14[frontend/]
+    A15[mlir/]
+    A16[runtime/]
+    A17[standalone_plugin_wheel/]
+  end
 
-  AST.cpp["AST.cpp"]
+  subgraph runtime/
+    R1[CMakeLists.txt]
+    R2[Makefile]
+    R3[README.rst]
+    R4[build/]
+    R5[include/]
+    R6[tests/]
+    R7[lib/]
+  end
 
-  parser --> AST.cpp
+  subgraph lib/
+    L1[CMakeLists.txt]
+    L2[OQDcapi/]
+    L3[backend/]
+    L4[capi/]
+    L5[registry/]
+  end
 
-  toy["toy"]
+  subgraph backend/
+    B1[CMakeLists.txt]
+    B2[common/]
+    B3[null_qubit/]
+    B4[openqasm/]
+    B5[oqd/]
+    B6[custom_device/]
+  end
 
-  include --> toy
+  subgraph custom_device/
+    CD1[CustomDevice.cpp]
+    CD2[CustomDevice.hpp]
+    CD3[CMakeLists.txt]
+    CD4[custom_device.toml]
+  end
 
-  AST.h["AST.h"]
-  Lexer.h["Lexer.h"]
-  Parser.h["Parser.h"]
-  MLIRGen.h["MLIRGen.h"]
-  Ops.td["Ops.td"]
+  %% Relationships
+  A --> A16
+  A16 --> R7
+  R7 --> L3
+  L3 --> B6
+  B6 --> CD1
+  B6 --> CD2
+  B6 --> CD3
+  B6 --> CD4
 
-  toy --> AST.h
-  toy --> Lexer.h
-  toy --> Parser.h
-  toy --> MLIRGen.h
-  toy --> Ops.td
+  %% Styling
+  classDef custom fill:#ffebcc,stroke:#ff9900,stroke-width:2px;
+  class B6,CD1,CD2,CD3,CD4 custom;
 
-  Dialect.cpp["Dialect.cpp"] 
-  MLIRGen.cpp["MLIRGen.cpp"] 
-
-  mlir --> Dialect.cpp
-  mlir --> MLIRGen.cpp
-
-  classDef yellow fill:#ff0,stroke:#333,stroke-width:2px,color:#000;
-
-  class mlir yellow
-  class Dialect.cpp yellow
-  class MLIRGen.cpp yellow
-  class MLIRGen.h yellow
-  class Ops.td yellow
-```
