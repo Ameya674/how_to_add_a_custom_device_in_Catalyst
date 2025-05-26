@@ -50,6 +50,9 @@ graph TD
 
   %% Styling
   classDef custom fill:#ffebcc,stroke:#ff9900,stroke-width:2px;
-  class B2,CD1,CD2,CD3,CD4 custom;
+  classDef yellow fill:#ffff99,stroke:#333,stroke-width:2px,color:#000;
+
+  class R1,R2,L1,B1,CD3 yellow;
+  class B2,CD1,CD2,CD4 custom;
 
 ```
