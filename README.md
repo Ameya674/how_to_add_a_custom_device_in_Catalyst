@@ -54,3 +54,10 @@ graph TD
 
   class R1,R2,L1,B1,B2,CD1,CD2,CD3,CD4 yellow;
 ```
+
+Add files the files and folders colored in yellow. 
+
+- CustomDevice.hpp: Header file for the custom device. Contains all the function signatures. 
+- CustomDevice.cpp: Contains the implementations for all the functions.
+- custom_device.toml: Configuration file for Pennylane to use the device, defines what gates and measurements are supported.
+
