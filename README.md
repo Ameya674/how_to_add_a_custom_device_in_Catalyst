@@ -49,13 +49,8 @@ graph TD
   B2 --> CD3
   B2 --> CD4
 
-  %% Styling
+  %% Unified yellow style
   classDef yellow fill:#ffff99,stroke:#333,stroke-width:2px,color:#000;
-  classDef custom fill:#ffebcc,stroke:#ff9900,stroke-width:2px;
 
-  class R1,R2,L1,B1,CD3 yellow;
-  class B2,CD1,CD2,CD4 custom;
-
-
-
+  class R1,R2,L1,B1,B2,CD1,CD2,CD3,CD4 yellow;
 ```
