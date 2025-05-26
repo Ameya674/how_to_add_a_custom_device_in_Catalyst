@@ -55,7 +55,7 @@ graph TD
   class R1,R2,L1,B1,B2,CD1,CD2,CD3,CD4 yellow;
 ```
 
-Add files the files and folders colored in yellow. 
+Add files the files and folders colored in yellow, edit if they already exist. 
 
 - CustomDevice.hpp: Header file for the custom device. Contains all the function signatures. 
 - CustomDevice.cpp: Contains the implementations for all the functions.
@@ -254,3 +254,8 @@ target_include_directories(rtd_custom_device
 
 set_property(TARGET rtd_custom_device PROPERTY POSITION_INDEPENDENT_CODE ON)
 ```
+
+#### /catalyst/runtime/lib/backend/CMakeLists.txt
+
+
+<pre><code>```diff add_subdirectory(null_qubit) configure_file(null_qubit/null_qubit.toml null_qubit.toml) +add_subdirectory(custom_device) +configure_file(custom_device/custom_device.toml custom_device.toml) if(ENABLE_OQD) add_subdirectory(oqd) configure_file(oqd/oqd.toml oqd.toml) endif() if(ENABLE_OPENQASM) add_subdirectory(openqasm) configure_file(openqasm/braket_local_qubit.toml braket_local_qubit.toml) configure_file(openqasm/braket_aws_qubit.toml braket_aws_qubit.toml) endif() ```</code></pre>
