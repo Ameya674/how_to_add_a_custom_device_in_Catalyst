@@ -448,3 +448,47 @@ check-tidy:
 
 ```
 
+## How to use this new device with Pennylane?
+
+#### Boilerplate code for the circuit (circuit.py)
+
+```
+import pennylane as qml
+from pennylane import numpy as np
+from pennylane import qjit
+import pathlib
+
+class CustomDevice(qml.devices.Device):
+    config_filepath = pathlib.Path("/catalyst/runtime/lib/backend/custom_device/custom_device.toml")
+
+    @staticmethod
+    def get_c_interface():
+        return "CustomDevice", "/catalyst/runtime/build/lib/librtd_custom_device.so"
+
+    def __init__(self, shots=None, wires=None):
+        super().__init__(wires=wires, shots=shots)
+
+    @property
+    def operations(self):
+        return {"Hadamard"}  # Declare Hadamard as supported
+
+    @property
+    def observables(self):
+        return {"State"}  # Support state measurement
+
+    def execute(self, circuits, config):
+        # Placeholder: Implement circuit execution
+        # This should call the C++ backend to execute the circuit
+        return np.array([1.0, 0.0], dtype=np.complex128)  # Dummy state for |0>
+
+@qjit(keep_intermediate=True)
+@qml.qnode(CustomDevice(wires=1))
+def circuit():
+    qml.Hadamard(wires=0)
+    qml.Hadamard(wires=0)
+    return qml.state()
+
+print(circuit())
+```
+
+
