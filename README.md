@@ -1,10 +1,8 @@
-# How to add a Custom Device in Catalyst
+> **Note:** The following Mermaid diagram won't render on GitHub natively. To view it rendered, use a Markdown viewer that supports Mermaid, such as VS Code with the [Markdown Preview Mermaid Support](https://marketplace.visualstudio.com/items?itemName=bierner.markdown-mermaid) extension.
 
-```mermaid
-graph TD
-  A[Start] --> B[Process]
-  B --> C[End]
-<!-- 
+<details>
+<summary>Click to view Mermaid diagram source</summary>
+
 ```mermaid
 graph TD
   A[catalyst/] --> A1[CITATION.cff]
@@ -53,5 +51,3 @@ graph TD
   class D6,E1,E2,E3,E4 custom;
 
   classDef custom fill=#ffebcc,stroke=#ff9900,stroke-width=2;
-
-``` -->
