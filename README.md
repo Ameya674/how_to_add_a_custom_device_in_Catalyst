@@ -2,6 +2,11 @@
 
 ```mermaid
 graph TD
+  A[Start] --> B[Process]
+  B --> C[End]
+<!-- 
+```mermaid
+graph TD
   A[catalyst/] --> A1[CITATION.cff]
   A --> A2[LICENSE]
   A --> A3[MANIFEST.in]
@@ -49,4 +54,4 @@ graph TD
 
   classDef custom fill=#ffebcc,stroke=#ff9900,stroke-width=2;
 
-```
+``` -->
