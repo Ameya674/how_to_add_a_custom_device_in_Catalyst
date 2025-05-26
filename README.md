@@ -49,10 +49,11 @@ graph TD
   B2 --> CD3
   B2 --> CD4
 
-  %% Unified yellow style
+  %% Unified yellow style for specific files only
   classDef yellow fill:#ffff99,stroke:#333,stroke-width:2px,color:#000;
 
-  class R1,R2,L1,B1,B2,CD1,CD2,CD3,CD4 yellow;
+  class R2,B1,CD3 yellow;
+
 ```
 
 Add files the files and folders colored in yellow, edit if they already exist. 
