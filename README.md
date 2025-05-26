@@ -233,6 +233,8 @@ supported_mcm_methods = []
 
 ## How to build?
 
+### Add/edit lines in green
+
 #### /catalyst/runtime/lib/backend/custom_device/CMakeLists.txt
 ```
 cmake_minimum_required(VERSION 3.20)
