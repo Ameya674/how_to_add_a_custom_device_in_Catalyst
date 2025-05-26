@@ -49,10 +49,10 @@ graph TD
   B2 --> CD3
   B2 --> CD4
 
-  %% Unified yellow style for specific files only
+  %% Unified yellow style for selected nodes
   classDef yellow fill:#ffff99,stroke:#333,stroke-width:2px,color:#000;
 
-  class R2,B1,CD3 yellow;
+  class R2,B1,B2,CD1,CD2,CD3,CD4 yellow;
 
 ```
 
