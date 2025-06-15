@@ -68,15 +68,25 @@ Add files the files and folders colored in yellow, edit if they already exist.
 #### CustomDevice.hpp
 ```
 #pragma once
-#include <QuantumDevice.hpp>
+
+#include <algorithm>
+#include <complex>
+#include <memory>
+#include <optional>
+#include <random>
 #include <vector>
 #include <string>
-#include <optional>
+
+#include "DataView.hpp"
+#include "QuantumDevice.hpp"
+#include "QubitManager.hpp"
+#include "Types.h"
 
 namespace Catalyst::Runtime::Devices {
 
-struct CustomDevice final : public QuantumDevice {
+struct CustomDevice : public QuantumDevice {
     explicit CustomDevice(const std::string &kwargs);
+    ~CustomDevice() override;
 
     auto AllocateQubit() -> QubitIdType override;
     auto AllocateQubits(size_t num_qubits) -> std::vector<QubitIdType> override;
@@ -101,11 +111,15 @@ struct CustomDevice final : public QuantumDevice {
 
     void State(DataView<std::complex<double>, 1> &state) override;
 
+private:
+    void applyHadamard(QubitIdType wire);
+    void getState(DataView<std::complex<double>, 1> &state);
 
+    size_t num_qubits_{0};
+    std::vector<std::complex<double>> state_;
 };
 
 } // namespace Catalyst::Runtime::Devices
-
 ```
 
 #### CustomDevice.cpp
@@ -116,83 +130,159 @@ struct CustomDevice final : public QuantumDevice {
 #include <string>
 #include <optional>
 #include <iostream>
+#include <cmath>
+#include <stdexcept>
+
+using std::vector;
+using std::string;
+using std::optional;
+using std::complex;
+using std::cout;
+using std::cerr;
+using std::runtime_error;
+
+// Helper function to print the state vector
+void printState(const vector<complex<double>>& state, const string& label) {
+    cout << label << ": [";
+    for (size_t i = 0; i < state.size(); ++i) {
+        cout << state[i].real() << "+" << state[i].imag() << "j";
+        if (i < state.size() - 1) cout << ", ";
+    }
+    cout << "]\n";
+}
 
 namespace Catalyst::Runtime::Devices {
 
-CustomDevice::CustomDevice([[maybe_unused]] const std::string &kwargs) {
-    std::cout << "Constructor: CustomDevice" << std::endl;
+CustomDevice::CustomDevice([[maybe_unused]] const string &kwargs) {
+    cout << "Constructor: CustomDevice\n";
+    cout << "kwargs: " << kwargs << '\n';
+    printState(state_, "State after constructor");
+}
+
+CustomDevice::~CustomDevice() = default;
+
+void CustomDevice::applyHadamard(QubitIdType wire) {
+    size_t dim = 1ULL << num_qubits_;
+    vector<complex<double>> new_state(dim, 0.0);
+    double sqrt2_inv = 1.0 / sqrt(2.0);
+
+    for (size_t i = 0; i < dim; ++i) {
+        size_t idx0 = i;
+        size_t idx1 = i ^ (1ULL << wire);
+        if (idx0 < idx1) {
+            new_state[idx0] = sqrt2_inv * (state_[idx0] + state_[idx1]);
+            new_state[idx1] = sqrt2_inv * (state_[idx0] - state_[idx1]);
+        }
+    }
+
+    state_ = std::move(new_state);
+    printState(state_, "State after Hadamard on wire " + std::to_string(wire));
+}
+
+void CustomDevice::getState(DataView<complex<double>, 1> &state) {
+    if (state.size() != state_.size()) {
+        throw runtime_error("State vector size mismatch");
+    }
+    copy(state_.begin(), state_.end(), state.begin());
 }
 
 auto CustomDevice::AllocateQubit() -> QubitIdType {
-    std::cout << "Called: AllocateQubit" << std::endl;
-    return 0;
+    cout << "Called: AllocateQubit\n";
+    size_t new_num_qubits = num_qubits_ + 1;
+    size_t dim = 1ULL << new_num_qubits;
+    state_.resize(dim, 0.0);
+    state_[0] = 1.0; // Initialize to |0...0>
+    num_qubits_ = new_num_qubits;
+    printState(state_, "State after AllocateQubit");
+    return static_cast<QubitIdType>(new_num_qubits - 1);
 }
 
-auto CustomDevice::AllocateQubits(size_t num_qubits) -> std::vector<QubitIdType> {
-    std::cout << "Called: AllocateQubits" << std::endl;
-    return std::vector<QubitIdType>(num_qubits, 0);
+auto CustomDevice::AllocateQubits(size_t num_qubits) -> vector<QubitIdType> {
+    cout << "Called: AllocateQubits\n";
+    if (num_qubits == 0) {
+        return {};
+    }
+    size_t current_num_qubits = num_qubits_;
+    size_t new_num_qubits = current_num_qubits + num_qubits;
+    size_t dim = 1ULL << new_num_qubits;
+    state_.resize(dim, 0.0);
+    state_[0] = 1.0; // Initialize to |0...0>
+    num_qubits_ = new_num_qubits;
+    printState(state_, "State after AllocateQubits");
+
+    vector<QubitIdType> qubits(num_qubits);
+    for (size_t i = 0; i < num_qubits; ++i) {
+        qubits[i] = static_cast<QubitIdType>(current_num_qubits + i);
+    }
+    return qubits;
 }
 
 void CustomDevice::ReleaseQubit(QubitIdType) {
-    std::cout << "Called: ReleaseQubit" << std::endl;
+    cout << "Called: ReleaseQubit\n";
+    if (num_qubits_ > 0) {
+        size_t new_num_qubits = num_qubits_ - 1;
+        size_t dim = 1ULL << new_num_qubits;
+        state_.resize(dim, 0.0);
+        state_[0] = 1.0; // Initialize to |0...0>
+        num_qubits_ = new_num_qubits;
+        printState(state_, "State after ReleaseQubit");
+    }
 }
 
 void CustomDevice::ReleaseAllQubits() {
-    std::cout << "Called: ReleaseAllQubits" << std::endl;
+    cout << "Called: ReleaseAllQubits\n";
+    num_qubits_ = 0;
+    state_.clear();
+    printState(state_, "State after ReleaseAllQubits");
 }
 
 auto CustomDevice::GetNumQubits() const -> size_t {
-    std::cout << "Called: GetNumQubits" << std::endl;
-    return 1; // Assume 1 qubit for simplicity
+    cout << "Called: GetNumQubits\n";
+    return num_qubits_;
 }
 
 void CustomDevice::SetDeviceShots(size_t shots) {
-    std::cout << "Called: SetDeviceShots with shots: " << shots << std::endl;
+    cout << "Called: SetDeviceShots with shots: " << shots << '\n';
+    // Shots not used in state vector simulation
 }
 
 auto CustomDevice::GetDeviceShots() const -> size_t {
-    std::cout << "Called: GetDeviceShots" << std::endl;
-    return 1;
+    cout << "Called: GetDeviceShots\n";
+    return 0; // State vector simulation doesn't use shots
 }
 
-void CustomDevice::NamedOperation(const std::string &name,
-                                 const std::vector<double> &params,
-                                 const std::vector<QubitIdType> &wires,
+void CustomDevice::NamedOperation(const string &name,
+                                 const vector<double> &params,
+                                 const vector<QubitIdType> &wires,
                                  bool inverse,
-                                 const std::vector<QubitIdType> &ctrl_wires,
-                                 const std::vector<bool> &ctrl_values) {
-    std::cout << "Called: NamedOperation with name: " << name << ", wires: ";
-    for (const auto &wire : wires) {
-        std::cout << wire << " ";
-    }
-    std::cout << ", inverse: " << inverse << std::endl;
-
-    if (name == "Hadamard" && wires.size() == 1 && params.empty() && ctrl_wires.empty()) {
-        std::cout << "Applying Hadamard gate on wire " << wires[0] << std::endl;
-        // Simulate Hadamard application (e.g., update a state vector)
-        // For demo, just log; in a real backend, apply the gate
+                                 const vector<QubitIdType> &ctrl_wires,
+                                 const vector<bool> &ctrl_values) {
+    if (name == "Hadamard" && wires.size() == 1 && params.empty() && ctrl_wires.empty() && !inverse) {
+        cout << "Applying Hadamard gate on wire " << wires[0] << '\n';
+        applyHadamard(wires[0]);
     } else {
-        std::cerr << "Unsupported operation: " << name << std::endl;
-        throw std::runtime_error("Unsupported operation: " + name);
+        cerr << "Unsupported operation: " << name << '\n';
+        throw runtime_error("Unsupported operation: " + name);
     }
 }
 
-auto CustomDevice::Measure(QubitIdType wire, std::optional<int32_t> postselect) -> Result {
-    std::cout << "Called: Measure on wire " << wire << std::endl;
+auto CustomDevice::Measure(QubitIdType wire, optional<int32_t> postselect) -> Result {
+    cout << "Called: Measure on wire " << wire << '\n';
     bool *result = new bool(true); // Dummy result for |0>
     return result;
 }
 
 void CustomDevice::StartTapeRecording() {
-    std::cout << "Called: StartTapeRecording" << std::endl;
+    cout << "Called: StartTapeRecording\n";
 }
 
 void CustomDevice::StopTapeRecording() {
-    std::cout << "Called: StopTapeRecording" << std::endl;
+    cout << "Called: StopTapeRecording\n";
 }
 
-void CustomDevice::State(DataView<std::complex<double>, 1> &state) {
-    std::cout << "Called: State" << std::endl;
+void CustomDevice::State(DataView<complex<double>, 1> &state) {
+    cout << "Called: State\n";
+    getState(state);
 }
 
 } // namespace Catalyst::Runtime::Devices
@@ -208,13 +298,7 @@ schema = 3
 Hadamard = { properties = ["invertible"] }  # Support Hadamard
 
 [operators.observables]
-PauliX = { }
-PauliY = { }
-PauliZ = { }
-Hamiltonian = { conditions = ["terms-commute"] }
-Sum = { conditions = ["terms-commute"] }
-SProd = { }
-Prod = { }
+
 
 [measurement_processes]
 ExpectationMP = { }
